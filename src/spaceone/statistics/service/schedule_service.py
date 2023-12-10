@@ -22,7 +22,7 @@ class ScheduleService(BaseService):
         self.resource_mgr: ResourceManager = self.locator.get_manager('ResourceManager')
         self.schedule_mgr: ScheduleManager = self.locator.get_manager('ScheduleManager')
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:write")
     @check_required(['topic', 'options', 'schedule', 'domain_id'])
     def add(self, params):
         """Add schedule for statistics
@@ -48,7 +48,7 @@ class ScheduleService(BaseService):
         self._verify_query_option(options, domain_id)
         return self.schedule_mgr.add_schedule(params)
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:write")
     @check_required(['schedule_id', 'domain_id'])
     def update(self, params):
         """Update schedule
@@ -70,7 +70,7 @@ class ScheduleService(BaseService):
 
         return self.schedule_mgr.update_schedule(params)
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:write")
     @check_required(['schedule_id', 'domain_id'])
     def enable(self, params):
         """Enable schedule
@@ -91,7 +91,7 @@ class ScheduleService(BaseService):
         schedule_vo = self.schedule_mgr.get_schedule(schedule_id, domain_id)
         return self.schedule_mgr.update_schedule_by_vo({'state': 'ENABLED'}, schedule_vo)
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:write")
     @check_required(['schedule_id', 'domain_id'])
     def disable(self, params):
         """Disable schedule
@@ -112,7 +112,7 @@ class ScheduleService(BaseService):
         schedule_vo = self.schedule_mgr.get_schedule(schedule_id, domain_id)
         return self.schedule_mgr.update_schedule_by_vo({'state': 'DISABLED'}, schedule_vo)
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:write")
     @check_required(['schedule_id', 'domain_id'])
     def delete(self, params):
         """Delete schedule
@@ -129,7 +129,7 @@ class ScheduleService(BaseService):
 
         self.schedule_mgr.delete_schedule(params['schedule_id'], params['domain_id'])
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:read")
     @check_required(['schedule_id', 'domain_id'])
     def get(self, params):
         """Get schedule
@@ -147,7 +147,7 @@ class ScheduleService(BaseService):
 
         return self.schedule_mgr.get_schedule(params['schedule_id'], params['domain_id'], params.get('only'))
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:read")
     @check_required(['domain_id'])
     @append_query_filter(['schedule_id', 'topic', 'state', 'data_source_id', 'resource_type', 'domain_id'])
     @append_keyword_filter(['schedule_id', 'topic', 'resource_type'])
@@ -173,7 +173,7 @@ class ScheduleService(BaseService):
         query = params.get('query', {})
         return self.schedule_mgr.list_schedules(query)
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:read")
     @check_required(['query', 'domain_id'])
     @append_query_filter(['domain_id'])
     @append_keyword_filter(['schedule_id', 'topic', 'resource_type'])
@@ -193,7 +193,7 @@ class ScheduleService(BaseService):
         query = params.get('query', {})
         return self.schedule_mgr.stat_schedules(query)
 
-    @transaction
+    @transaction()
     @append_query_filter([])
     def list_domains(self, params):
         """ This is used by Scheduler

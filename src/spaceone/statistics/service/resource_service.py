@@ -18,7 +18,7 @@ class ResourceService(BaseService):
         super().__init__(*args, **kwargs)
         self.resource_mgr: ResourceManager = self.locator.get_manager('ResourceManager')
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="workspace_member:read")
     @check_required(['aggregate', 'domain_id'])
     def stat(self, params):
         """Statistics query to resource

@@ -20,7 +20,7 @@ class HistoryService(BaseService):
         self.resource_mgr: ResourceManager = self.locator.get_manager('ResourceManager')
         self.history_mgr: HistoryManager = self.locator.get_manager('HistoryManager')
 
-    @transaction(append_meta={'authorization.scope': 'DOMAIN'})
+    @transaction(scope="domain_owner:write")
     @check_required(['schedule_id', 'domain_id'])
     def create(self, params):
         """Statistics query to resource
@@ -51,7 +51,7 @@ class HistoryService(BaseService):
         results = response.get('results', [])
         self.history_mgr.create_history(schedule_vo, topic, results, domain_id)
 
-    @transaction(append_meta={'authorization.scope': 'PROJECT'})
+    @transaction(scope="workspace_member:read")
     @check_required(['domain_id'])
     @append_query_filter(['topic', 'domain_id', 'user_projects'])
     @append_keyword_filter(['topic'])
@@ -74,7 +74,7 @@ class HistoryService(BaseService):
         query = params.get('query', {})
         return self.history_mgr.list_history(query)
 
-    @transaction(append_meta={'authorization.scope': 'PROJECT'})
+    @transaction(scope="workspace_member:read")
     @check_required(['query', 'domain_id'])
     @append_query_filter(['topic', 'domain_id', 'user_projects'])
     @append_keyword_filter(['topic'])
